@@ -25,7 +25,7 @@ E.g. if the hidden sequence is 1234:
 guess | hint    | comment (not shown in the game)
 ------+---------+-------------------------------------------------------------
 1561  | ○       | a black dot for the first 1
-4321  | ○ ● ● ● | all digits are there, but none in the correct spot
+4321  | ● ● ● ● | all digits are there, but none in the correct spot
 2154  | ○ ● ●   | 1 and 2 are correct but in the wrong spot, a black dot for 4
 ```
 
