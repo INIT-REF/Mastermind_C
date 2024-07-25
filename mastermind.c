@@ -71,9 +71,9 @@ void evaluate(char* set, int d, int s, int g) {
         printf(" | ");
 
         for (int i = 0; i < correct; i++)
-            printf("🌕");
+            printf("○ ");
         for (int i = 0; i < semi; i++)
-            printf("🌑");
+            printf("● ");
 
         printf("\n");
     }
