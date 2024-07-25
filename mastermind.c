@@ -149,6 +149,8 @@ void custom_game(void) {
 
 // Display the menu and get user's choice
 void menu(void) {
+    char c;
+
     printf("+------------------------------------------------------------------------+\n");
     printf("|         Main menu - Enter your choice as a number from 1 to %d          |\n", MAXOPTIONS);
     printf("+------------------------------------------------------------------------+\n");
@@ -159,7 +161,8 @@ void menu(void) {
     printf("+------------------------------------------------------------------------+\n\n");
     printf("-> ");
     
-    switch (getchar()) {
+    while (c = getchar() < 1 || c > MAXOPTIONS)
+    switch (c) {
         case '1': new_game(6, 4, 12); break;
         case '2': new_game(8, 5, 12); break;
         case '3': custom_game(); break;
