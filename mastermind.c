@@ -10,6 +10,12 @@
 
 
 struct termios saved_attributes;
+void reset_input_mode(void);
+void set_raw_mode(void);
+void evaluate(char* set, int digits, int spots, int guesses, int timelimit);
+void new_game(int digits, int spots, int guesses, int timelimit);
+void custom_game(void);
+void menu(void);
 
 
 // Reset terminal to the state it had before
@@ -40,26 +46,26 @@ void set_raw_mode(void) {
 
 
 // Evaluate useres guess
-void evaluate(char* set, int d, int s, int g, int t) {
-    char* guess = (char*)malloc(s * sizeof(char));
-    char* found = (char*)malloc(s * sizeof(char));
+void evaluate(char* set, int digits, int spots, int guesses, int timelimit) {
+    char* guess = (char*)malloc(spots * sizeof(char));
+    char* found = (char*)malloc(spots * sizeof(char));
     int correct = 0, semi;
 
-    int ng = g == 0 ? 1 : 0;
+    int guesscount = guesses == 0 ? 1 : 0;
     time_t start = time(NULL);
 
-    while (correct < s && g != ng) {
-        if (t > 0 && t < (int)(time(NULL) - start)) {
-            t = 0;
+    while (correct < spots && guesses != guesscount) {
+        if (timelimit > 0 && timelimit < (int)(time(NULL) - start)) {
+            timelimit = 0;
         break;
                                                     }
         correct = 0;
         semi = 0;
-        ng++;
+        guesscount++;
 
         memcpy(found, set, sizeof(set));
 
-        for (int i = 0; i < s; i++) {
+        for (int i = 0; i < spots; i++) {
             read(STDIN_FILENO, &guess[i], 1);
             guess[i] -= '0';
             if (guess[i] == set[i]) {
@@ -68,8 +74,8 @@ void evaluate(char* set, int d, int s, int g, int t) {
             }
         }
 
-        for (int i = 0; i < s; i++)
-            for (int j = 0; j < s; j++)
+        for (int i = 0; i < spots; i++)
+            for (int j = 0; j < spots; j++)
                 if (guess[i] == found[j]) {
                     found[j] = 99;
                     semi++;
@@ -88,71 +94,66 @@ void evaluate(char* set, int d, int s, int g, int t) {
     free(found);
     free(guess);
     
-    if (correct == s) {
+    if (correct == spots) {
         printf("Congratulations! You solved the puzzle in ");
         printf("%d seconds, ", (int)(time(NULL) - start));
-        printf("using %d guesses.\n", g == 0 ? --ng : ng);
+        printf("using %d guesses.\n\n", guesses == 0 ? --guesscount : guesscount);
     }
-    else if (t == 0)
-        printf("Sorry, time's up!\n");
+    else if (timelimit == 0)
+        printf("Sorry, time's up!\n\n");
     else
-        printf("Sorry, you didn't solve the puzzle within %d guesses\n", ng);
+        printf("Sorry, you didn't solve the puzzle within %d guesses.\n\n", guesscount);
 }
 
 
 // Start a new game
-void new_game(int d, int s, int g, int t) {
-    char* set = (char*)malloc(s * sizeof(char));
+void new_game(int digits, int spots, int guesses, int timelimit) {
+    char* set = (char*)malloc(spots * sizeof(char));
 
-    if (g == 0)
-        printf("New game with %d digits, %d spots and unlimited guesses\n", d, s);
-    else
-        printf("New game with %d digits, %d spots and %d guesses\n", d, s, g);
-
-    for (int i = 0; i < s; i++) {
-        set[i] = (1 + rand() % d) % 10;
+    for (int i = 0; i < spots; i++) {
+        set[i] = (1 + rand() % digits) % 10;
     }
 
     printf("Please enter your first guess:\n\n");
     set_raw_mode();
-    evaluate(set, d, s, g, t);
+    evaluate(set, digits, spots, guesses, timelimit);
     free(set);
 }
 
 
 // Get parameters for a new game with custom settings
 void custom_game(void) {
-    int d, s, g, t;
+    int digits, spots, guesses, timelimit;
 
     printf("\nPlease enter the number of possible digits (2-10): ");
-    scanf("%d", &d);
-    while (d < 2 || d > 10) {
+    scanf("%d", &digits);
+    while (digits < 2 || digits > 10) {
         printf("Invalid number of digits, please enter a number from 2 to 10: ");
-        scanf("%d", &d);
+        scanf("%d", &digits);
     }
 
     printf("\nPlease enter the number of spots (2-10): ");
-    scanf("%d", &s);
-    while (s < 2 || s > 10) {
+    scanf("%d", &spots);
+    while (spots < 2 || spots > 10) {
         printf("Invalid number of spots, please enter a number from 2 to 10: ");
-        scanf("%d", &s);
+        scanf("%d", &spots);
     }
 
     printf("\nPlease enter the number of guesses (0 for unlimited): ");
-    scanf("%d", &g);
-    while (g < 0) {
+    scanf("%d", &guesses);
+    while (guesses < 0) {
         printf("Invalid number of guesses, please enter a positive number (or 0 for unlimited): ");
-        scanf("%d", &g);
+        scanf("%d", &guesses);
     }
 
     printf("\nPlease enter the time limit in seconds (0 for unlimited): ");
-    scanf("%d", &t);
-    while (g < 0) {
+    scanf("%d", &timelimit);
+    while (timelimit < 0) {
         printf("Invalid time limit, please enter a positive number (or 0 for unlimited): ");
-        scanf("%d", &t);
+        scanf("%d", &timelimit);
     }
 
-    new_game(d, s, g, t);
+    new_game(digits, spots, guesses, timelimit);
 }
 
 
@@ -169,7 +170,7 @@ void menu(void) {
     printf("| 4 - Quit (You can exit anytime by pressing Ctrl+C)                          |\n");
     printf("+-----------------------------------------------------------------------------+\n\n");
     printf("-> ");
-    
+
     while(!c) {
         c = getchar();
         switch (c) {
