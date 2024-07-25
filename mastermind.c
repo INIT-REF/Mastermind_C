@@ -40,7 +40,7 @@ void set_raw_mode(void) {
 
 
 // Evaluate useres guess
-void evaluate(char* set, int d, int s, int g) {
+void evaluate(char* set, int d, int s, int g, int t) {
     char* guess = (char*)malloc(s * sizeof(char));
     char* found = (char*)malloc(s * sizeof(char));
     int correct = 0, semi;
@@ -49,6 +49,10 @@ void evaluate(char* set, int d, int s, int g) {
     time_t start = time(NULL);
 
     while (correct < s && g != ng) {
+        if (t > 0 && t < (int)(time(NULL) - start)) {
+            t = 0;
+        break;
+                                                    }
         correct = 0;
         semi = 0;
         ng++;
@@ -89,13 +93,15 @@ void evaluate(char* set, int d, int s, int g) {
         printf("%d seconds, ", (int)(time(NULL) - start));
         printf("using %d guesses.\n", g == 0 ? --ng : ng);
     }
+    else if (t == 0)
+        printf("Sorry, time's up!\n");
     else
         printf("Sorry, you didn't solve the puzzle within %d guesses\n", ng);
 }
 
 
 // Start a new game
-void new_game(int d, int s, int g) {
+void new_game(int d, int s, int g, int t) {
     char* set = (char*)malloc(s * sizeof(char));
 
     if (g == 0)
@@ -109,14 +115,14 @@ void new_game(int d, int s, int g) {
 
     printf("Please enter your first guess:\n\n");
     set_raw_mode();
-    evaluate(set, d, s, g);
+    evaluate(set, d, s, g, t);
     free(set);
 }
 
 
 // Get parameters for a new game with custom settings
 void custom_game(void) {
-    int d, s, g;
+    int d, s, g, t;
 
     printf("\nPlease enter the number of possible digits (2-10): ");
     scanf("%d", &d);
@@ -139,7 +145,14 @@ void custom_game(void) {
         scanf("%d", &g);
     }
 
-    new_game(d, s, g);
+    printf("\nPlease enter the time limit in seconds (0 for unlimited): ");
+    scanf("%d", &t);
+    while (g < 0) {
+        printf("Invalid time limit, please enter a positive number (or 0 for unlimited): ");
+        scanf("%d", &t);
+    }
+
+    new_game(d, s, g, t);
 }
 
 
@@ -147,21 +160,21 @@ void custom_game(void) {
 void menu(void) {
     char c = 0;
 
-    printf("+------------------------------------------------------------------------+\n");
-    printf("|         Main menu - Enter your choice as a number from 1 to %d          |\n", MAXOPTIONS);
-    printf("+------------------------------------------------------------------------+\n");
-    printf("| 1 - Start a new game in Classic mode (6 digits, 4 spots, 12 guesses)   |\n");
-    printf("| 2 - Start a new game in \"Super\" mode (8 digits, 5 spots, 12 guesses)   |\n");
-    printf("| 3 - Start a new game with custom settings                              |\n");
-    printf("| 4 - Quit (You can exit anytime by pressing Ctrl+C)                     |\n");
-    printf("+------------------------------------------------------------------------+\n\n");
+    printf("+-----------------------------------------------------------------------------+\n");
+    printf("|            Main menu - Enter your choice as a number from 1 to %d            |\n", MAXOPTIONS);
+    printf("+-----------------------------------------------------------------------------+\n");
+    printf("| 1 - New game in Classic mode (6 digits, 4 spots, 12 guesses, no time limit) |\n");
+    printf("| 2 - New game in \"Super\" mode (8 digits, 5 spots, 12 guesses, no time limit) |\n");
+    printf("| 3 - New game with custom settings                                           |\n");
+    printf("| 4 - Quit (You can exit anytime by pressing Ctrl+C)                          |\n");
+    printf("+-----------------------------------------------------------------------------+\n\n");
     printf("-> ");
     
     while(!c) {
         c = getchar();
         switch (c) {
-            case '1': new_game(6, 4, 12); break;
-            case '2': new_game(8, 5, 12); break;
+            case '1': new_game(6, 4, 12, 0); break;
+            case '2': new_game(8, 5, 12, 0); break;
             case '3': custom_game(); break;
             case '4': exit(0); break;
             default: {
