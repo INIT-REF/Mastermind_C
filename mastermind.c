@@ -39,34 +39,44 @@ void set_raw_mode(void) {
 }
 
 
+// Check if a number is in the set
+int member_of(int n, char* arr, int l) {
+    for (int i = 0; i < l; i++)
+        if (arr[i] == n) {
+            arr[i] == 99;
+            return 1;
+        }
+
+    return 0;
+}
+
+
 // Evaluate useres guess
 void evaluate(char* set, int d, int s, int g) {
     char* guess = (char*)malloc(s * sizeof(char));
     char* found = (char*)malloc(s * sizeof(char));
     int correct = 0, semi;
-
-    for (int i = 0; i < s; i++)
-        printf("%d", set[i]);
-    printf("\n\n");
+    int ng = g;
 
     while (correct < s && g--) {
         correct = 0;
         semi = 0;
-        memset(found, 0, sizeof(found));
+
+        memcpy(found, set, sizeof(set));
 
         for (int i = 0; i < s; i++) {
             read(STDIN_FILENO, &guess[i], 1);
             guess[i] -= '0';
             if (guess[i] == set[i]) {
                 correct++;
-                found[i] = 1;
+                found[i] = 99;
             }
         }
 
-        for (int i = 0; i < s; i++)
-            for (int j = 0; j < s; j++) 
-                if (guess[i] == set[j] && !found[i])
-                    semi++;
+        for (int i = 0; i < s; i++) {
+            if (member_of(guess[i], found, s))
+                semi++;
+        }
 
         printf(" | ");
 
@@ -77,11 +87,14 @@ void evaluate(char* set, int d, int s, int g) {
 
         printf("\n");
     }
+
+    free(found);
+    free(guess);
     
     if (correct == s)
-        printf("Congratulations!\n");
+        printf("Congratulations, you solved the puzzle!\n");
     else
-        printf("Sorry\n");
+        printf("Sorry, you didn't solve the puzzle within %d guesses\n", ng);
 }
 
 
@@ -101,6 +114,7 @@ void new_game(int d, int s, int g) {
     printf("Please enter your first guess:\n\n");
     set_raw_mode();
     evaluate(set, d, s, g);
+    free(set);
 }
 
 
@@ -142,7 +156,8 @@ void menu(void) {
     printf("| 2 - Start a new game in \"Super\" mode (8 digits, 5 spots, 12 guesses)   |\n");
     printf("| 3 - Start a new game with custom settings                              |\n");
     printf("| 4 - Quit (You can exit anytime by pressing Ctrl+C)                     |\n");
-    printf("+------------------------------------------------------------------------+\n");
+    printf("+------------------------------------------------------------------------+\n\n");
+    printf("-> ");
     
     switch (getchar()) {
         case '1': new_game(6, 4, 12); break;
