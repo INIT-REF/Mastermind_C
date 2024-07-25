@@ -39,18 +39,6 @@ void set_raw_mode(void) {
 }
 
 
-// Check if a number is in the set
-int member_of(int n, char* arr, int l) {
-    for (int i = 0; i < l; i++)
-        if (arr[i] == n) {
-            arr[i] == 99;
-            return 1;
-        }
-
-    return 0;
-}
-
-
 // Evaluate useres guess
 void evaluate(char* set, int d, int s, int g) {
     char* guess = (char*)malloc(s * sizeof(char));
@@ -75,10 +63,12 @@ void evaluate(char* set, int d, int s, int g) {
             }
         }
 
-        for (int i = 0; i < s; i++) {
-            if (member_of(guess[i], found, s))
-                semi++;
-        }
+        for (int i = 0; i < s; i++)
+            for (int j = 0; j < s; j++)
+                if (guess[i] == found[j]) {
+                    found[j] = 99;
+                    semi++;
+                }
 
         printf(" | ");
 
