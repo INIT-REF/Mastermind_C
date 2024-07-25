@@ -56,11 +56,13 @@ void evaluate(char* set, int d, int s, int g) {
     char* guess = (char*)malloc(s * sizeof(char));
     char* found = (char*)malloc(s * sizeof(char));
     int correct = 0, semi;
-    int ng = g;
 
-    while (correct < s && g--) {
+    int ng = g == 0 ? 1 : 0;
+
+    while (correct < s && g != ng) {
         correct = 0;
         semi = 0;
+        ng++;
 
         memcpy(found, set, sizeof(set));
 
@@ -149,6 +151,8 @@ void custom_game(void) {
 
 // Display the menu and get user's choice
 void menu(void) {
+    char c = 0;
+
     printf("+------------------------------------------------------------------------+\n");
     printf("|         Main menu - Enter your choice as a number from 1 to %d          |\n", MAXOPTIONS);
     printf("+------------------------------------------------------------------------+\n");
@@ -159,12 +163,20 @@ void menu(void) {
     printf("+------------------------------------------------------------------------+\n\n");
     printf("-> ");
     
-    switch (getchar()) {
-        case '1': new_game(6, 4, 12); break;
-        case '2': new_game(8, 5, 12); break;
-        case '3': custom_game(); break;
-        case '4': exit(0); break;
-        default: printf("Invalid option, please enter a number from 1 to %d\n", MAXOPTIONS);
+    while(!c) {
+        c = getchar();
+        switch (c) {
+            case '1': new_game(6, 4, 12); break;
+            case '2': new_game(8, 5, 12); break;
+            case '3': custom_game(); break;
+            case '4': exit(0); break;
+            default: {
+                printf("Invalid option, please enter a number from 1 to %d\n-> ", MAXOPTIONS);
+                while((c = getchar()) != '\n' && c != EOF);
+                c = 0;
+            }
+            break;
+        }
     }
 }
 
