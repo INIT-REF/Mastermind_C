@@ -46,6 +46,7 @@ void evaluate(char* set, int d, int s, int g) {
     int correct = 0, semi;
 
     int ng = g == 0 ? 1 : 0;
+    time_t start = time(NULL);
 
     while (correct < s && g != ng) {
         correct = 0;
@@ -83,8 +84,11 @@ void evaluate(char* set, int d, int s, int g) {
     free(found);
     free(guess);
     
-    if (correct == s)
-        printf("Congratulations, you solved the puzzle!\n");
+    if (correct == s) {
+        printf("Congratulations! You solved the puzzle in ");
+        printf("%d seconds, ", (int)(time(NULL) - start));
+        printf("using %d guesses.\n", g == 0 ? --ng : ng);
+    }
     else
         printf("Sorry, you didn't solve the puzzle within %d guesses\n", ng);
 }
