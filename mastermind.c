@@ -5,7 +5,7 @@
 #include <time.h>
 #include <string.h>
 
-#define VERSION "0.1"
+#define VERSION "0.2"
 #define MAXOPTIONS 4
 
 
