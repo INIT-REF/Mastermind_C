@@ -1,2 +1,2 @@
-# Mastermind_ASM
-A Mastermind game in Assembly
+# Mastermind_C
+A Mastermind game in C
