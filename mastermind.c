@@ -128,17 +128,23 @@ void custom_game(void) {
         digits = strtol(buf, &endptr, 10);
     }
 
+    printf("\n");
+
     while (spots < 2 || spots > 10) {
         printf("Please enter the number of spots (2-10): ");
         fgets(buf, 10, stdin);
         spots = strtol(buf, &endptr, 10);
     }
 
+    printf("\n");
+
     while (guesses < 0) {
         printf("Please enter the number of guesses (0 for unlimited): ");
         fgets(buf, 10, stdin);
         guesses = strtol(buf, &endptr, 10); 
     }
+
+    printf("\n");
 
     while (timelimit < 0) {
         printf("Please enter the time limit in seconds (0 for unlimited): ");
@@ -188,7 +194,20 @@ void menu(void) {
 int main(int argc, char **argv) {
     srand(time(NULL));
     printf("\nWelcome to Mastermind_C version %s\n\n", VERSION);
-    menu();
+    //menu();
+
+    if (argc > 1) {
+        if (!strcmp(argv[1], "classic"))
+            new_game(6, 4, 12, 0);
+        else if (!strcmp(argv[1], "super"))
+            new_game(8, 5, 12, 0);
+        else if (!strcmp(argv[1], "custom"))
+            custom_game();
+        else
+            menu();
+    }
+    else
+        menu();
 
     return EXIT_SUCCESS;
 }

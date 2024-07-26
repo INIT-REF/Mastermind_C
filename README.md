@@ -6,6 +6,8 @@ If you choose Classic mode you can place 6 digits (1-6 representing the 6 availa
 
 You can also chose to create a game with custom options, chosing between 2 to 10 digits (1-9 and 0 in the latter case), 2 to 10 spots and an arbitrary number of guesses (0 for unlimited).
 
+Instead of starting the game and chosing the mode via the menu, you can also directly start with your intended mode by starting with a command line argument. Assuming your compiled executable is named "mastermind", `mastermind classic`, `mastermind super` and `mastermind custom` will start a new game in the respective mode.
+
 ## Rules
 You probably already know the rules of the game, but I'll recap them quickly:
 
@@ -17,7 +19,7 @@ In Custom mode with 3 digits and 10 spots it could be 1221331232, 1112322231, 33
 
 Your task is to find this sequence using as few guesses as possible, at least within the limit given by the game mode or your choice in custom mode.
 
-When you entered a guess, the game will evaluate the input and output a hint as a sequence of black and/or white dot (○ and/or ●), giving you information on how good your guess was. A black dot means that you have a correct digit at the correct position. A white dot means that you have a digit in your guess which is also present in the sequence, but it is not at the correct spot (not counting digits which were already marked with a black dot). The position of the dots is independent of the position of the digits in your guess. Black dots will always appear first, followed by white dots.
+When you entered a guess, the game will evaluate the input and output a hint as a sequence of black and/or white dots (○ and/or ●), giving you information on how good your guess was. A black dot means that you have a correct digit at the correct position. A white dot means that you have a digit in your guess which is also present in the sequence, but it is not at the correct spot (not counting digits which were already marked with a black dot). The position of the dots is independent of the position of the digits in your guess. Black dots will always appear first, followed by white dots.
 
 E.g. if the hidden sequence is 1234:
  
