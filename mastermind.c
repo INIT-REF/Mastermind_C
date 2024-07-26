@@ -58,7 +58,6 @@ void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
         memcpy(found, set, spots * sizeof(*set));
 
         for (int i = 0; i < spots;) {
-            //c = 0;
             read(STDIN_FILENO, &c, 1);
             
             if (c < '0' || c > '9')  
@@ -82,7 +81,7 @@ void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
                     semi++;
                 }
 
-        printf(" | ");
+        printf("| ");
 
         for (int i = 0; i < correct; i++)
             printf("○ ");
