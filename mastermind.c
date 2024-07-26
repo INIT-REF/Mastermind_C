@@ -78,7 +78,6 @@ void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
             for (int j = 0; j < spots; j++)
                 if (guess[i] == found[j]) {
                     found[j] = 99;
-                    guess[i] = 88;
                     semi++;
                 }
 
