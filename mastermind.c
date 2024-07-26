@@ -5,50 +5,42 @@
 #include <time.h>
 #include <string.h>
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 #define MAXOPTIONS 4
 
 
 struct termios saved_attributes;
-void reset_input_mode(void);
-void set_raw_mode(void);
-void evaluate(char* set, int digits, int spots, int guesses, int timelimit);
-void new_game(int digits, int spots, int guesses, int timelimit);
-void custom_game(void);
-void menu(void);
-
 
 // Reset terminal to the state it had before
 void reset_input_mode(void) {
-    tcsetattr (STDIN_FILENO, TCSANOW, &saved_attributes);
+    tcsetattr(STDIN_FILENO, TCSANOW, &saved_attributes);
 }
 
 
 // Set terminal to raw mode
 void set_raw_mode(void) {
     struct termios tattr;
-    char *name;
 
     if (!isatty (STDIN_FILENO)) {
-        fprintf (stderr, "Not a terminal.\n");
-        exit (EXIT_FAILURE);
+        fprintf(stderr, "Not a terminal.\n");
+        exit(EXIT_FAILURE);
     }
 
-    tcgetattr (STDIN_FILENO, &saved_attributes);
-    atexit (reset_input_mode);
+    tcgetattr(STDIN_FILENO, &saved_attributes);
+    atexit(reset_input_mode);
 
-    tcgetattr (STDIN_FILENO, &tattr);
+    tcgetattr(STDIN_FILENO, &tattr);
     tattr.c_lflag &= ~(ICANON);
     tattr.c_cc[VMIN] = 1;
     tattr.c_cc[VTIME] = 0;
-    tcsetattr (STDIN_FILENO, TCSAFLUSH, &tattr);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &tattr);
 }
 
 
 // Evaluate useres guess
-void evaluate(char* set, int digits, int spots, int guesses, int timelimit) {
-    char* guess = (char*)malloc(spots * sizeof(char));
-    char* found = (char*)malloc(spots * sizeof(char));
+void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
+    char guess[10] = {0};
+    char found[10] = {0};
     int correct = 0, semi;
 
     int guesscount = guesses == 0 ? 1 : 0;
@@ -56,14 +48,14 @@ void evaluate(char* set, int digits, int spots, int guesses, int timelimit) {
 
     while (correct < spots && guesses != guesscount) {
         if (timelimit > 0 && timelimit < (int)(time(NULL) - start)) {
-            timelimit = 0;
+            timelimit = 1;
         break;
                                                     }
         correct = 0;
         semi = 0;
         guesscount++;
 
-        memcpy(found, set, sizeof(set));
+        memcpy(found, set, spots * sizeof(*set));
 
         for (int i = 0; i < spots; i++) {
             read(STDIN_FILENO, &guess[i], 1);
@@ -90,16 +82,12 @@ void evaluate(char* set, int digits, int spots, int guesses, int timelimit) {
 
         printf("\n");
     }
-
-    free(found);
-    free(guess);
     
     if (correct == spots) {
-        printf("Congratulations! You solved the puzzle in ");
-        printf("%d seconds, ", (int)(time(NULL) - start));
-        printf("using %d guesses.\n\n", guesses == 0 ? --guesscount : guesscount);
+        printf("Congratulations! You solved the puzzle in %d seconds, using %d guesses.\n\n",
+               (int)(time(NULL) - start), guesses == 0 ? --guesscount : guesscount);
     }
-    else if (timelimit == 0)
+    else if (timelimit == 1)
         printf("Sorry, time's up!\n\n");
     else
         printf("Sorry, you didn't solve the puzzle within %d guesses.\n\n", guesscount);
@@ -108,7 +96,7 @@ void evaluate(char* set, int digits, int spots, int guesses, int timelimit) {
 
 // Start a new game
 void new_game(int digits, int spots, int guesses, int timelimit) {
-    char* set = (char*)malloc(spots * sizeof(char));
+    char set[10] = {0};
 
     for (int i = 0; i < spots; i++) {
         set[i] = (1 + rand() % digits) % 10;
@@ -117,40 +105,37 @@ void new_game(int digits, int spots, int guesses, int timelimit) {
     printf("Please enter your first guess:\n\n");
     set_raw_mode();
     evaluate(set, digits, spots, guesses, timelimit);
-    free(set);
 }
 
 
 // Get parameters for a new game with custom settings
 void custom_game(void) {
-    int digits, spots, guesses, timelimit;
+    char buf[10];
+    char *endptr;
+    int digits = 0, spots = 0, guesses = -1, timelimit = -1;
 
-    printf("\nPlease enter the number of possible digits (2-10): ");
-    scanf("%d", &digits);
     while (digits < 2 || digits > 10) {
-        printf("Invalid number of digits, please enter a number from 2 to 10: ");
-        scanf("%d", &digits);
+        printf("Please enter the number of possible digits (2-10): ");
+        fgets(buf, 10, stdin);
+        digits = strtol(buf, &endptr, 10);
     }
 
-    printf("\nPlease enter the number of spots (2-10): ");
-    scanf("%d", &spots);
     while (spots < 2 || spots > 10) {
-        printf("Invalid number of spots, please enter a number from 2 to 10: ");
-        scanf("%d", &spots);
+        printf("Please enter the number of spots (2-10): ");
+        fgets(buf, 10, stdin);
+        spots = strtol(buf, &endptr, 10);
     }
 
-    printf("\nPlease enter the number of guesses (0 for unlimited): ");
-    scanf("%d", &guesses);
     while (guesses < 0) {
-        printf("Invalid number of guesses, please enter a positive number (or 0 for unlimited): ");
-        scanf("%d", &guesses);
+        printf("Please enter the number of guesses (0 for unlimited): ");
+        fgets(buf, 10, stdin);
+        guesses = strtol(buf, &endptr, 10); 
     }
 
-    printf("\nPlease enter the time limit in seconds (0 for unlimited): ");
-    scanf("%d", &timelimit);
     while (timelimit < 0) {
-        printf("Invalid time limit, please enter a positive number (or 0 for unlimited): ");
-        scanf("%d", &timelimit);
+        printf("Please enter the time limit in seconds (0 for unlimited): ");
+        fgets(buf, 10, stdin);
+        timelimit = strtol(buf, &endptr, 10);
     }
 
     new_game(digits, spots, guesses, timelimit);
@@ -159,29 +144,32 @@ void custom_game(void) {
 
 // Display the menu and get user's choice
 void menu(void) {
-    char c = 0;
+    char buf[10] = {0};
+    char *endptr;
+    int choice = 0;
 
-    printf("+-----------------------------------------------------------------------------+\n");
-    printf("|            Main menu - Enter your choice as a number from 1 to %d            |\n", MAXOPTIONS);
-    printf("+-----------------------------------------------------------------------------+\n");
-    printf("| 1 - New game in Classic mode (6 digits, 4 spots, 12 guesses, no time limit) |\n");
-    printf("| 2 - New game in \"Super\" mode (8 digits, 5 spots, 12 guesses, no time limit) |\n");
-    printf("| 3 - New game with custom settings                                           |\n");
-    printf("| 4 - Quit (You can exit anytime by pressing Ctrl+C)                          |\n");
-    printf("+-----------------------------------------------------------------------------+\n\n");
-    printf("-> ");
+    printf("+-----------------------------------------------------------------------------+\n"
+           "|            Main menu - Enter your choice as a number from 1 to %d            |\n"
+           "+-----------------------------------------------------------------------------+\n"
+           "| 1 - New game in Classic mode (6 digits, 4 spots, 12 guesses, no time limit) |\n"
+           "| 2 - New game in \"Super\" mode (8 digits, 5 spots, 12 guesses, no time limit) |\n"
+           "| 3 - New game with custom settings                                           |\n"
+           "| 4 - Quit (You can exit anytime by pressing Ctrl+C)                          |\n"
+           "+-----------------------------------------------------------------------------+\n\n"
+           "-> ", MAXOPTIONS);
 
-    while(!c) {
-        c = getchar();
-        switch (c) {
-            case '1': new_game(6, 4, 12, 0); break;
-            case '2': new_game(8, 5, 12, 0); break;
-            case '3': custom_game(); break;
-            case '4': exit(0); break;
+    while(!choice) {
+        fgets(buf, 10, stdin);
+        choice = strtol(buf, &endptr, 10);
+
+        switch (choice) {
+            case 1: new_game(6, 4, 12, 0); break;
+            case 2: new_game(8, 5, 12, 0); break;
+            case 3: custom_game(); break;
+            case 4: exit(0); break;
             default: {
                 printf("Invalid option, please enter a number from 1 to %d\n-> ", MAXOPTIONS);
-                while((c = getchar()) != '\n' && c != EOF);
-                c = 0;
+                choice = 0;
             }
             break;
         }
