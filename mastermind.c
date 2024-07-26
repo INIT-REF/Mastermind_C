@@ -5,7 +5,7 @@
 #include <time.h>
 #include <string.h>
 
-#define VERSION "0.3"
+#define VERSION "0.4"
 #define MAXOPTIONS 4
 
 
@@ -30,10 +30,9 @@ void set_raw_mode(void) {
     atexit(reset_input_mode);
 
     tcgetattr(STDIN_FILENO, &tattr);
-    tattr.c_lflag &= ~(ICANON);
-    tattr.c_cc[VMIN] = 1;
-    tattr.c_cc[VTIME] = 0;
+    tattr.c_lflag &= ~(ICANON|ECHO);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &tattr);
+    setvbuf(stdout, NULL, _IONBF, 0);
 }
 
 
@@ -41,6 +40,7 @@ void set_raw_mode(void) {
 void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
     char guess[10] = {0};
     char found[10] = {0};
+    char c;
     int correct = 0, semi;
 
     int guesscount = guesses == 0 ? 1 : 0;
@@ -57,13 +57,22 @@ void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
 
         memcpy(found, set, spots * sizeof(*set));
 
-        for (int i = 0; i < spots; i++) {
-            read(STDIN_FILENO, &guess[i], 1);
-            guess[i] -= '0';
+        for (int i = 0; i < spots;) {
+            //c = 0;
+            read(STDIN_FILENO, &c, 1);
+            
+            if (c < '0' || c > '9')  
+                continue;
+                
+            guess[i] = c - '0';
+            printf("%c ", c);
+             
             if (guess[i] == set[i]) {
                 correct++;
                 found[i] = 99;
             }
+
+            i++;
         }
 
         for (int i = 0; i < spots; i++)
