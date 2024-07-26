@@ -5,7 +5,7 @@
 #include <time.h>
 #include <string.h>
 
-#define VERSION "0.4"
+#define VERSION "0.5"
 #define MAXOPTIONS 4
 
 
@@ -156,7 +156,7 @@ void custom_game(void) {
 }
 
 
-// Display the menu and get user's choice
+// Display the menu and get choice
 void menu(void) {
     char buf[10] = {0};
     char *endptr;
