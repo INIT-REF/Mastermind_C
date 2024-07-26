@@ -195,6 +195,7 @@ void menu(void) {
 int main(int argc, char **argv) {
     srand(time(NULL));
     printf("\nWelcome to Mastermind_C version %s\n\n", VERSION);
+    char c = 0;
 
     if (argc > 1) {
         if (!strcmp(argv[1], "classic"))
