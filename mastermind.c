@@ -79,6 +79,7 @@ void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
                 if (guess[i] == found[j]) {
                     found[j] = 99;
                     semi++;
+                    break;
                 }
 
         printf("| ");
