@@ -30,9 +30,9 @@ void set_raw_mode(void) {
     atexit(reset_input_mode);
 
     tcgetattr(STDIN_FILENO, &tattr);
-    tattr.c_lflag &= ~(ICANON);
-    tattr.c_cc[VMIN] = 1;
-    tattr.c_cc[VTIME] = 0;
+    tattr.c_lflag &= ~(ICANON|ECHO);
+    tattr.c_cc[VMIN] = 0;
+    tattr.c_cc[VTIME] = 1;
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &tattr);
 }
 
@@ -59,6 +59,7 @@ void evaluate(char *set, int digits, int spots, int guesses, int timelimit) {
 
         for (int i = 0; i < spots; i++) {
             read(STDIN_FILENO, &guess[i], 1);
+            printf("%c", guess[i]);
             guess[i] -= '0';
             if (guess[i] == set[i]) {
                 correct++;
