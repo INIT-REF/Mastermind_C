@@ -36,5 +36,6 @@ guess | hint    | comment (not shown in the game)
 - Option to go back to the main menu when a game is done
 - ~~Let the user chose a time limit instead (or in addition to) a number of guesses~~
 - ~~Show the number of guesses and/or time needed to get the solution~~
+- ~~Add the option to start a particular mode via command line arguments~~
 - Allow the user to edit a guess before submission
 - General cleanup
